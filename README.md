@@ -1,4 +1,5 @@
-# aind-analysis-wrapper
+# data-curation-aind-analysis-wrapper
+
 
 ⚠️ **IMPORTANT: This is a Template Repository** ⚠️
 
