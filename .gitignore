@@ -152,3 +152,6 @@ dmypy.json
 !.vscode/extensions.json
 !.vscode/*.code-snippets
 .vscode
+example_input_data/job_dict/10d6af8e-ed4b-414d-829b-0a52f7ec4cfc.json
+example_input_data/job_dict/10d6af8e-ed4b-414d-829b-0a52f7ec4cfc.json
+example_input_data/job_dict/10d6af8e-ed4b-414d-829b-0a52f7ec4cfc.json
