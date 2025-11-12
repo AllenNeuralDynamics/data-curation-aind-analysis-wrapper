@@ -77,9 +77,17 @@ def run_analysis(
     # nwb processing code
     nwb = nwb_utils_rachel.attach_dfs(nwbfile)
 
+    # plot locations
+    plot_loc = '/results/plots/'
+
+    if not os.path.exists(plot_loc):
+        os.makedirs(plot_loc)
+
+
+
     # simple analyses. anything more complicated, we should refactor
     data_curation_summary_plots.plot_kurtosis_snr_check(nwb, channel_dict, 
-                                            loc = '/root/capsule/results/')
+                                            loc = plot_loc)
 
 
 
