@@ -1,72 +1,95 @@
 # ---------------------
 # Standard Library
 # ---------------------
-import argparse
-import glob
-import itertools
-import json
-import warnings
-import os
+
 
 # ---------------------
 # Third-Party Libraries
 # ---------------------
 import numpy as np
 import pandas as pd
-import requests
-import seaborn as sns
 import matplotlib
 matplotlib.use('Agg')  # Set backend before importing pyplot
 import matplotlib.pyplot as plt
-import matplotlib as mpl
-
 
 # ---------------------
-# NWB / Domain-Specific Libraries
+# NWB / Domain-Specific Libraries (only what's used)
 # ---------------------
-from hdmf_zarr import NWBZarrIO
-import aind_dynamic_foraging_basic_analysis.licks.annotation as a
-from aind_dynamic_foraging_data_utils import nwb_utils, alignment, enrich_dfs
-import aind_dynamic_foraging_data_utils.code_ocean_utils as co_utils
-from plot import foraging_summary_plots 
+from aind_dynamic_foraging_basic_analysis.plot import plot_session_scroller as pss
+from aind_dynamic_foraging_basic_analysis.metrics import snr_kurtosis 
 
+# TODO: change the ylabel into the intended measurements
+def plot_kurtosis_snr_check(nwb, channel_dict, preprocessing = 'dff-bright_mc-iso-IRLS', fps: float = 20.0, loc=None):
+    # fip is channels + preprocessing
 
+    channels = channel_dict.keys()
 
-# ---------------------
-# arguments
-# ---------------------
+    fip = [f"{ch}_{preprocessing}" for ch in channels]
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--nwb_filepath', type=str, default=None, help='NWB file path')
+    # top: zoomed view (1 event row + len(fip) traces)
+    n_zoom = 1 + len(fip)
+    # bottom: full-session view (only len(fip) traces)
+    n_full = len(fip)
 
-parser.add_argument('--saved_loc', type=str, default='/results/', help='Location for saved plots')
+    total_plots = n_zoom + n_full
+    fig, ax = plt.subplots(total_plots, 1, figsize=(30, 2 * total_plots))
+    
+    # add title of session_ID and preprocessing type. 
 
-parser.add_argument('--channels', type=str, default=None, help='Comma-separated list of channels to plot')
+    fig.suptitle(f'{nwb.session_id}: preprocessing = {preprocessing}', fontsize=15)
 
-parser.add_argument('--plot_type', type=str, default=None, help='Plot behavior or neural plots')
+    ax_zoom = [ax[i] for i in range(len(ax)) if (i + 1) % 2 == 0] + [ax[-1]]
+    ax_full =  [ax[i] for i in range(len(ax)) if (i + 1) % 2 == 1][:-1]
 
-parser.add_argument('--fitted_model', type=str, default="QLearning_L2F1_CKfull_softmax", help='Model to fit behavior data')
+    # First call: zoomed view with events + all fip traces
+    pss.plot_session_scroller(
+        nwb,
+        fig=fig,
+        ax=ax_zoom,
+        plot_list=['go cue', 'bouts', 'manual rewards', 'auto rewards', 'rewarded lick'],
+        fip=fip
+    )
 
-# parser.add_argument('--pdf_save', type=bool, default=False, help='Model to fit behavior data')
+    # zoom ones should be -50 to 150. 
+    for ax in ax_zoom:
+        ax.set_xlim(-50, 150)
+        ax.set_title('')
+        ax.set_ylabel('')
+    
+    # get xlim, xmax
+    xmin = nwb.df_events.iloc[0]["timestamps"]
+    x_last = nwb.df_events.iloc[-1]["timestamps"]
 
-args = parser.parse_args()
+    # plot the full trace WITH the snr/kurtosis 
+    for (ax, fip_i) in zip(ax_full, fip):
+        
+        pss.plot_fip(nwb.df_fip, fip_i, ax)
 
+        # set xlim, set ylabel
+        ax.set_xlim(xmin, x_last)
+        ax.set_ylabel(channel_dict[fip_i[:3]])
 
-# if args.pdf_save:
-mpl.rcParams['pdf.fonttype'] = 42 # allow text of pdf to be edited in illustrator
-mpl.rcParams['font.family'] = 'Arial' 
-mpl.rcParams["axes.spines.right"] = False
-mpl.rcParams["axes.spines.top"] = False
+        # snr, kurtosis
+        df_fip_channel_trace = nwb.df_fip.query(f"event == '{fip_i}'")['data'].values
+        (snr, noise, peaks) = snr_kurtosis.estimate_snr(df_fip_channel_trace, fps)
+        kurtosis = snr_kurtosis.estimate_kurtosis(df_fip_channel_trace)
+        data_cur_stats = f"SNR: {snr:.2f}\nKurtosis: {kurtosis:.2f}"
+        ax.text(
+            0.98,
+            0.95,
+            data_cur_stats,
+            transform=ax.transAxes,
+            ha="right",
+            va="top",
+            fontsize=18,
+            fontweight="bold",
+            color="black",
+            bbox=dict(facecolor="white", alpha=0.8, edgecolor="none"),
+        )
+        
 
+    if loc is not None:
+        plt.savefig(f'{loc}{nwb.session_id.replace("behavior_","")}_test_plot.png', bbox_inches='tight', transparent=False)
+        plt.close(fig)
 
-SAVED_LOC = args.saved_loc
-
-
-if args.plot_type:
-    plot_behavior = 'behavior' in args.plot_type
-    plot_neural = 'neural' in args.plot_type
-    plot_lick_raster = 'lickraster' in args.plot_type
-    plot_baseline = 'baseline' in args.plot_type
-else:
-    plot_behavior, plot_neural, plot_lick_raster, plot_baseline = True, True, True, True
-
+    return fig, ax

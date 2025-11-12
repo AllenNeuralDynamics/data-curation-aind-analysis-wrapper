@@ -13,6 +13,8 @@ from analysis_pipeline_utils.utils_analysis_wrapper import (
 from data_curation_analysis_model import (DataCurationAnalysisOutputs,
                                     DataCurationAnalysisSpecification)
 
+from hdmf_zarr import NWBZarrIO
+
 
 ANALYSIS_BUCKET = os.getenv("ANALYSIS_BUCKET")
 logger = logging.getLogger(__name__)
@@ -21,6 +23,8 @@ logger = logging.getLogger(__name__)
 import numpy as np
 import pandas as pd 
 from plots import data_curation_summary_plots
+from utils import nwb_utils as nwb_utils_rachel
+import re
 
 
 def run_analysis(
@@ -52,6 +56,15 @@ def run_analysis(
         logger.info("Record already exists, skipping.")
         return
 
+    # parse parameters and validate them
+    channel_dict = parameters["channels"]
+    # require keys of the form G|R|Iso followed by _ and a digit 0-4 (e.g. "G_0", "R_3", "Iso_2")
+    pattern = re.compile(r"^(?:G|R|Iso)_[0-4]$")
+    invalid = [k for k in channel_dict.keys() if not pattern.match(str(k))]
+    if invalid:
+        raise ValueError(f"Invalid channel keys (must match G/R/Iso_0-4): {invalid}")
+    logger.info(f"Validated channel keys: {list(channel_dict.keys())}")
+
     # Execute analysis and write to results folder
     # using the passed parameters
     # Example:
@@ -59,40 +72,16 @@ def run_analysis(
     for location in analysis_dispatch_inputs.file_location:
         with NWBZarrIO(location, 'r') as io:
             nwbfile = io.read()
-        run_your_analysis(nwbfile, **parameters)
-    # OR
-        subprocess.run(["--param_1": parameters["param_1"]])
+        
+
+    # nwb processing code
+    nwb = nwb_utils_rachel.attach_dfs(nwbfile)
+
+    # simple analyses. anything more complicated, we should refactor
+    data_curation_summary_plots.plot_kurtosis_snr_check(nwb, channel_dict, 
+                                            loc = '/root/capsule/results/')
 
 
-        logger.info(f"{location}")
-        cmd = [
-            "python", 
-            "analysis_wrapper/run_summary_plots_individual.py",
-            "--nwb_filepath", location, 
-            "--channels", parameters['channels'], # should be placed in CSV eventuallys
-            "--plot_type", parameters['plot_types'],
-            "--fitted_model", parameters["fitted_model"] #,
-            # "--pdf_save", parameters["pdf_save"]
-            # Add other arguments here if needed
-        ]
-        print(f"Running: {' '.join(cmd)}")
-        try:
-            subprocess.run(cmd, check=True, capture_output=True, text=True)
-        # except Exception as e:
-        #     print(f"Error processing {location}: {e}")
-        except subprocess.CalledProcessError as e:
-            print(f"\ Error processing {location}")
-            print(f"Command: {e.cmd}")
-            print(f"Return code: {e.returncode}")
-            print(f"\nSTDOUT:\n{e.stdout}")
-            print(f"\nSTDERR:\n{e.stderr}")
-
-    processing.output_parameters = ExampleAnalysisOutputs(
-        isi_violations=["example_violation_1", "example_violation_2"],
-        additional_info=(
-            "This is an example of additional information about the analysis."
-        )[0],
-    )
 
     if not dry_run:
         logger.info("Running analysis and posting results")
@@ -107,10 +96,11 @@ if __name__ == "__main__":
         level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
     )
 
-    cli_cls = make_cli_model(ExampleAnalysisSpecification)
+    cli_cls = make_cli_model(DataCurationAnalysisSpecification)
     cli_model = cli_cls()
     logger.info(f"Command line args {cli_model.model_dump()}")
-    input_model_paths = tuple(cli_model.input_directory.glob("job_dict/*"))
+    
+    input_model_paths = tuple(cli_model.input_directory.glob("job_dict/*")) # how should i set this as? 
     logger.info(
         f"Found {len(input_model_paths)} input job models to run analysis on."
     )
@@ -123,11 +113,11 @@ if __name__ == "__main__":
         merged_parameters = get_analysis_model_parameters(
             analysis_dispatch_inputs,
             cli_model,
-            ExampleAnalysisSpecification,
+            DataCurationAnalysisSpecification,
             analysis_parameters_json_path=cli_model.input_directory
             / "analysis_parameters.json",
         )
-        analysis_specification = ExampleAnalysisSpecification.model_validate(
+        analysis_specification = DataCurationAnalysisSpecification.model_validate(
             merged_parameters
         ).model_dump()
         logger.info(f"Running with analysis specs {analysis_specification}")
