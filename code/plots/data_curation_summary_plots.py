@@ -18,7 +18,6 @@ import matplotlib.pyplot as plt
 from aind_dynamic_foraging_basic_analysis.plot import plot_session_scroller as pss
 from aind_dynamic_foraging_basic_analysis.metrics import snr_kurtosis 
 
-# TODO: change the ylabel into the intended measurements
 def plot_kurtosis_snr_check(nwb, channel_dict, preprocessing = 'dff-bright_mc-iso-IRLS', fps: float = 20.0, loc=None):
     # fip is channels + preprocessing
 
@@ -69,10 +68,20 @@ def plot_kurtosis_snr_check(nwb, channel_dict, preprocessing = 'dff-bright_mc-is
         ax.set_xlim(xmin, x_last)
         ax.set_ylabel(channel_dict[fip_i[:3]])
 
-        # snr, kurtosis
-        df_fip_channel_trace = nwb.df_fip.query(f"event == '{fip_i}'")['data'].values
-        (snr, noise, peaks) = snr_kurtosis.estimate_snr(df_fip_channel_trace, fps)
-        kurtosis = snr_kurtosis.estimate_kurtosis(df_fip_channel_trace)
+        #######  snr, kurtosis #######
+        # Get the DataFrame for the current FIP channel
+        df_channel = nwb.df_fip.query(f"event == '{fip_i}'")
+
+        # Filter the DataFrame to look at data after time = 0 to 500 seconds before end of trial
+        last_timestamps = df_channel.iloc[-1].timestamps - 500
+        df_channel_time_filtered = df_channel.query(f"timestamps > 0 and timestamps < {last_timestamps}")
+        
+        # Extract the trace data as a NumPy array
+        channel_trace = df_channel_time_filtered['data'].values
+
+        
+        (snr, noise, peaks) = snr_kurtosis.estimate_snr(channel_trace, fps)
+        kurtosis = snr_kurtosis.estimate_kurtosis(channel_trace)
         data_cur_stats = f"SNR: {snr:.2f}\nKurtosis: {kurtosis:.2f}"
         ax.text(
             0.98,
