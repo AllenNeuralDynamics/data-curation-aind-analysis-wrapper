@@ -23,7 +23,10 @@ def plot_kurtosis_snr_check(nwb, channel_dict, preprocessing = 'dff-bright_mc-is
 
     channels = channel_dict.keys()
 
-    fip = [f"{ch}_{preprocessing}" for ch in channels]
+    if preprocessing == "raw":
+        fip = channels
+    else:
+        fip = [f"{ch}_{preprocessing}" for ch in channels]
 
     # top: zoomed view (1 event row + len(fip) traces)
     n_zoom = 1 + len(fip)

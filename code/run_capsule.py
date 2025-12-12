@@ -86,7 +86,7 @@ def run_analysis(
 
 
     # simple analyses. anything more complicated, we should refactor
-    data_curation_summary_plots.plot_kurtosis_snr_check(nwb, channel_dict, 
+    data_curation_summary_plots.plot_kurtosis_snr_check(nwb, channel_dict, parameters["preprocessing"],
                                             loc = plot_loc)
 
 
