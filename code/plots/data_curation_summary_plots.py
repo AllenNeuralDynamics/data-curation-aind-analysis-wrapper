@@ -69,7 +69,7 @@ def plot_kurtosis_snr_check(nwb, channel_dict, preprocessing = 'dff-bright_mc-is
 
         # set xlim, set ylabel
         ax.set_xlim(xmin, x_last)
-        ax.set_ylabel(channel_dict[fip_i[:3]])
+        ax.set_ylabel(channel_dict[fip_i.replace("_" + preprocessing, "")])
 
         #######  snr, kurtosis #######
         # Get the DataFrame for the current FIP channel
