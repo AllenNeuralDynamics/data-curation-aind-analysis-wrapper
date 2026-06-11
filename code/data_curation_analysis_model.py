@@ -24,14 +24,13 @@ class DataCurationAnalysisSpecification(GenericModel):
     # pipeline_v14: bool=Field(default=False, description="Is the data coming from pipeline v14 and need timestamps/raw_timestamps swapped")
 
 
-# only saving plots, no outputs needed 
+# outputted snr and kurtosis
 class DataCurationAnalysisOutputs(GenericModel):
     """
-    Represents the outputs of an analysis, including a list of ISI violations.
+    Represents the outputs of an analysis, getting data curation info.
     """
-    additional_info: Optional[str] = Field(
-        default=None, description="Additional information about the analysis"
-    )
+    kurtosis: float=Field(default=None, description="kurtosis")
+    snr: float=Field(default=None, description= "signal to noise ratio")
 
 # class DataCurationAnalysisSpecificationCLI(
 #     DataCurationAnalysisSpecification, BaseSettings, cli_parse_args=True

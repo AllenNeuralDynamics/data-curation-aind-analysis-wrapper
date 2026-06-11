@@ -104,4 +104,4 @@ def plot_kurtosis_snr_check(nwb, channel_dict, preprocessing = 'dff-bright_mc-is
         plt.savefig(f'{loc}{nwb.session_id.replace("behavior_","")}_test_plot.png', bbox_inches='tight', transparent=False)
         plt.close(fig)
 
-    return fig, ax
+    return kurtosis, snr

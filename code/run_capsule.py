@@ -86,10 +86,13 @@ def run_analysis(
 
 
     # simple analyses. anything more complicated, we should refactor
-    data_curation_summary_plots.plot_kurtosis_snr_check(nwb, channel_dict, parameters["preprocessing"],
+    (kurtosis, snr) = data_curation_summary_plots.plot_kurtosis_snr_check(nwb, channel_dict, parameters["preprocessing"],
                                             loc = plot_loc)
 
-
+    processing.output_parameters = DataCurationAnalysisOutputs(
+        kurtosis=kurtosis,
+        snr = snr
+    )
 
     if not dry_run:
         logger.info("Running analysis and posting results")
