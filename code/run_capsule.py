@@ -25,7 +25,7 @@ ANALYSIS_BUCKET = os.getenv("ANALYSIS_BUCKET")
 import numpy as np
 import pandas as pd 
 from plots import data_curation_summary_plots
-from utils import nwb_utils as nwb_utils_rachel
+from rachel_analysis_utils import nwb_utils as nwb_utils_rachel
 import re
 
 
