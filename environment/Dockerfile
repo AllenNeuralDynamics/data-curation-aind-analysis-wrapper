@@ -39,7 +39,7 @@ RUN --mount=type=secret,id=git-access-token \
     aind_hierarchical_bootstrap \
     -e git+https://github.com/AllenNeuralDynamics/aind-dynamic-foraging-basic-analysis.git@v0.3.35#egg=aind-dynamic-foraging-basic-analysis \
     -e git+https://github.com/AllenNeuralDynamics/aind-dynamic-foraging-data-utils.git@v0.1.36#egg=aind-dynamic-foraging-data-utils \
-    -e git+https://github.com/AllenNeuralDynamics/analysis-pipeline-utils@ae433685788495d8cc63032d2a8fb67cb354190f#egg=analysis-pipeline-utils
+    -e git+https://github.com/AllenNeuralDynamics/analysis-pipeline-utils@v0.2.1#egg=analysis-pipeline-utils
 
 COPY postInstall /
 RUN --mount=type=secret,id=secrets . /run/secrets/secrets \
