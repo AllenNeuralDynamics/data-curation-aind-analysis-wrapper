@@ -1,17 +1,17 @@
 {
     "asset_name": [
-        "820117_example_asset"
+        "behavior_754280_2024-11-27_11-14-15"    
     ],
     "s3_location": [
         "s3://codeocean-s3datasetsbucket-1u41qdg42ur9/8351747a-f472-43f9-a53b-cd1f9aa35288"
     ],
     "docdb_record_id": [
-        "dfb3a13e-ed0b-48bc-8ede-d68da8f3fb8b"
+        "c6eb823c-1488-4f1f-b066-67c6a839b41d"
     ],
-    "file_location": null,
-    "distributed_parameters": {
-            "isi_violations_cutoff": 0.05
-    },
+    "file_location": [
+            "s3://codeocean-s3datasetsbucket-1u41qdg42ur9/c04e0c23-2286-4731-8777-377ab6e68f88/nwb/behavior_754280_2024-11-27_11-14-15.nwb"
+    ],
+    "distributed_parameters": null,
     "group_metadata": null,
     "query": "{\"subject.subject_id\": \"820117\", \"data_description.data_level\": \"derived\", \"data_description.modality.abbreviation\": \"behavior\"}",
     "analysis_code": {
@@ -30,9 +30,12 @@
             }
         ],
         "parameters": {
-            "analysis_name": "Unit Filtering",
-            "analysis_tag": "V1",
-            "isi_violations_cutoff": 0.8
+            "name":"hello analysis framework!", 
+            "channels":{
+                "G_0":"Fake_channel_to_test!",
+                "Iso_0":"Fake channel_to_test 2"
+            },
+            "preprocessing": "raw"
         },
         "core_dependency": null
     }

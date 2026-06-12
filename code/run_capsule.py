@@ -1,5 +1,5 @@
 from pydantic import Field
-from typing import List, Optional, Union
+import os 
 
 from aind_data_schema.base import GenericModel
 
@@ -9,7 +9,8 @@ from analysis_pipeline_utils.analysis_dispatch_model import \
     AnalysisDispatchModel
 
 from analysis_pipeline_utils.utils_analysis_wrapper import (
-    get_analysis_model_parameters, make_cli_model)
+    run_analysis_jobs)
+
 
 from data_curation_analysis_model import (DataCurationAnalysisOutputs,
                                     DataCurationAnalysisSpecification)
@@ -18,7 +19,7 @@ from hdmf_zarr import NWBZarrIO
 
 
 ANALYSIS_BUCKET = os.getenv("ANALYSIS_BUCKET")
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
 
 # for analysis code
 import numpy as np
@@ -58,22 +59,14 @@ def run_analysis(
 ) -> dict | None:
 
     # parse parameters and validate them
-    channel_dict = parameters["channels"]
+    channel_dict = analysis_parameters.channels
     # require keys of the form G|R|Iso followed by _ and a digit 0-4 (e.g. "G_0", "R_3", "Iso_2")
     pattern = re.compile(r"^(?:G|R|Iso)_[0-4]$")
     invalid = [k for k in channel_dict.keys() if not pattern.match(str(k))]
     if invalid:
         raise ValueError(f"Invalid channel keys (must match G/R/Iso_0-4): {invalid}")
-    logger.info(f"Validated channel keys: {list(channel_dict.keys())}")
+    # logger.info(f"Validated channel keys: {list(channel_dict.keys())}")
 
-    # parse parameters and validate them
-    channel_dict = parameters["channels"]
-    # require keys of the form G|R|Iso followed by _ and a digit 0-4 (e.g. "G_0", "R_3", "Iso_2")
-    pattern = re.compile(r"^(?:G|R|Iso)_[0-4]$")
-    invalid = [k for k in channel_dict.keys() if not pattern.match(str(k))]
-    if invalid:
-        raise ValueError(f"Invalid channel keys (must match G/R/Iso_0-4): {invalid}")
-    logger.info(f"Validated channel keys: {list(channel_dict.keys())}")
 
     # Execute analysis and write to results folder
     # using the passed parameters
@@ -101,20 +94,14 @@ def run_analysis(
 
 
     # simple analyses. anything more complicated, we should refactor
-    (kurtosis, snr) = data_curation_summary_plots.plot_kurtosis_snr_check(nwb, channel_dict, parameters["preprocessing"],
+    (kurtosis, snr) = data_curation_summary_plots.plot_kurtosis_snr_check(nwb, channel_dict, analysis_parameters.preprocessing,
                                             loc = plot_loc)
 
-    processing.output_parameters = DataCurationAnalysisOutputs(
-        kurtosis=kurtosis,
-        snr = snr
-    )
+    output_params = {'kurtosis': kurtosis, 'snr': snr}
 
-    if not dry_run:
-        logger.info("Running analysis and posting results")
-        write_results_and_metadata(processing, ANALYSIS_BUCKET)
-        logger.info("Successfully wrote record to docdb and s3")
-    else:
-        logger.info("Dry run complete. Results not posted")
+    return output_params
+
+
 
 
 if __name__ == "__main__":

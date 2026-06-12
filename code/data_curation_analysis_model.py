@@ -2,7 +2,6 @@
 This is an example of an analysis-specific schema for the parameters required by that analysis
 """
 
-from typing import List, Optional, Union
 
 from aind_data_schema.base import GenericModel
 from pydantic import Field

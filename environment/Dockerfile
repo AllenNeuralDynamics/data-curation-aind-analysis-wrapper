@@ -4,7 +4,7 @@ FROM $REGISTRY_HOST/codeocean/mambaforge3:24.5.0-0-python3.12.4-ubuntu22.04
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG GIT_ASKPASS
-COPY git-askpass /
+COPY git-ask-pass /
 
 ENV DOCDB_HOST=api.allenneuraldynamics.org
 ENV DOCDB_DATABASE=analysis
@@ -17,7 +17,6 @@ RUN --mount=type=secret,id=git-access-token \
     GIT_ACCESS_TOKEN="$(cat /run/secrets/git-access-token)" \
     pip install -U --no-cache-dir \
     aind-analysis-arch-result-access==1.0 \
-    awscli==1.38.3 \
     ipykernel==6.30.0 \
     ipympl==0.9.6 \
     matplotlib==3.7.5 \
@@ -30,7 +29,8 @@ RUN --mount=type=secret,id=git-access-token \
     analysis-pipeline-utils==0.2.1 \
     boto3==1.42.30 \
     pydantic-settings==2.9.1 \
-    s3fs==2026.1.0
+    s3fs==2026.1.0 \
+    codeocean==0.15.0 \
     scikit-learn==1.7.1 \
     scipy==1.16.0 \
     seaborn==0.13.2 \
@@ -39,10 +39,8 @@ RUN --mount=type=secret,id=git-access-token \
     zarr==2.18.6 \
     aind_hierarchical_bootstrap \
     -e git+https://github.com/AllenNeuralDynamics/aind-dynamic-foraging-basic-analysis.git@v0.3.35#egg=aind-dynamic-foraging-basic-analysis \
-    -e git+https://github.com/AllenNeuralDynamics/aind-dynamic-foraging-data-utils.git@v0.1.36#egg=aind-dynamic-foraging-data-utils \
+    -e git+https://github.com/AllenNeuralDynamics/aind-dynamic-foraging-data-utils.git@v0.1.36#egg=aind-dynamic-foraging-data-utils
 
 COPY postInstall /
-RUN --mount=type=secret,id=secrets . /run/secrets/secrets \
-    && /postInstall
 RUN --mount=type=secret,id=secrets . /run/secrets/secrets \
     && /postInstall
