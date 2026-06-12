@@ -1,9 +1,8 @@
 metadata_version: 1
-name: aind-analysis-wrapper-template
+name: data-curation-aind-analysis-wrapper
 description: This repository serves as an example template for building your own analysis
   workflows.
 authors:
-- name: Tom Chartrand
-- name: Arjun Sridhar
-- name: Arielle Leon
-- name: Han Hou
+- name: Rachel Lee
+- name: Kenta Hagihara
+- name: Alex Piet

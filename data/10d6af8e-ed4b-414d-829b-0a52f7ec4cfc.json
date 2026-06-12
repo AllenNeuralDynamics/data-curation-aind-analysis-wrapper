@@ -1,0 +1,10 @@
+{
+    "s3_location": [
+        "s3://codeocean-s3datasetsbucket-1u41qdg42ur9/c04e0c23-2286-4731-8777-377ab6e68f88"
+    ],
+    "file_location": [
+        "s3://codeocean-s3datasetsbucket-1u41qdg42ur9/c04e0c23-2286-4731-8777-377ab6e68f88/nwb/behavior_754280_2024-11-27_11-14-15.nwb",
+        "s3://codeocean-s3datasetsbucket-1u41qdg42ur9/a11922be-c12a-42d0-b62d-0527e767cb46/nwb/behavior_754280_2024-12-02_11-09-44.nwb"
+    ],
+    "distributed_parameters": null
+}

@@ -1,0 +1,10 @@
+{
+    "fixed_parameters": {
+        "name":"hello analysis framework!", 
+        "channels":{
+            "G_0":"Fake_channel_to_test!",
+            "Iso_0":"Fake channel_to_test 2"
+        },
+        "preprocessing": "raw"
+    }
+}
