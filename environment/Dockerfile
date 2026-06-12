@@ -44,3 +44,5 @@ RUN --mount=type=secret,id=git-access-token \
 COPY postInstall /
 RUN --mount=type=secret,id=secrets . /run/secrets/secrets \
     && /postInstall
+RUN --mount=type=secret,id=secrets . /run/secrets/secrets \
+    && /postInstall

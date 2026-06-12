@@ -1,12 +1,14 @@
-import json
-import logging
-import os
+from pydantic import Field
+from typing import List, Optional, Union
+
+from aind_data_schema.base import GenericModel
+
+from analysis_pipeline_utils.metadata import \
+    get_metadata_for_records
 
 from analysis_pipeline_utils.analysis_dispatch_model import \
     AnalysisDispatchModel
-from analysis_pipeline_utils.metadata import (construct_processing_record,
-                                              docdb_record_exists,
-                                              write_results_and_metadata)
+
 from analysis_pipeline_utils.utils_analysis_wrapper import (
     get_analysis_model_parameters, make_cli_model)
 
@@ -27,34 +29,77 @@ from utils import nwb_utils as nwb_utils_rachel
 import re
 
 
+    run_analysis_jobs)
+from dotenv import load_dotenv
+
+# TODO: use pydantic settings instead
+load_dotenv("settings.env")
+
+# ======================================================================
+# USER MUST EDIT THIS SECTION
+#
+# 1. Implement  your analysis specification and any output analysis model
+# 2. Update the aliases below
+#
+# Do NOT modify any code outside this section except run_analysis().
+# ======================================================================
+
+"""
+This is an example of an analysis-specific schema
+for the parameters required by that analysis
+"""
+
+class ExampleAnalysisParameters(GenericModel):
+    """
+    Represents the specification for an analysis, including its name,
+    version, libraries to track, and parameters.
+    """
+
+    analysis_name: str = Field(
+        ..., description="User-defined name for the analysis"
+    )
+    analysis_tag: str = Field(
+        ...,
+        description=(
+            "User-defined tag to organize results "
+            "for querying analysis output",
+        ),
+    )
+    isi_violations_cutoff: float = Field(
+        ..., description="The value to be using when filtering units by this"
+    )
+
+
+class ExampleAnalysisOutputs(GenericModel):
+    """
+    Represents the outputs of an analysis, including a list of ISI violations.
+    """
+
+    isi_violations: List[Union[str, int]] = Field(
+        ..., description="List of ISI violations detected by the analysis"
+    )
+    additional_info: Optional[str] = Field(
+        default=None, description="Additional information about the analysis"
+    )
+
+AnalysisInputModel = ExampleAnalysisParameters
+AnalysisOutputModel = ExampleAnalysisOutputs
+
+
+### USER EDITABLE FUNCTION WHERE ANALYSIS IS EXECUTED
 def run_analysis(
     analysis_dispatch_inputs: AnalysisDispatchModel,
-    dry_run: bool = True,
-    **parameters,
-) -> None:
-    """
-    Runs the analysis
+    analysis_parameters: AnalysisInputModel
+) -> dict | None:
 
-    Parameters
-    ----------
-    analysis_dispatch_inputs: AnalysisDispatchModel
-        The input model with input data
-        from dispatcher
-
-    dry_run: bool, Default True
-        Dry run of analysis. If true,
-        does not post results
-
-    parameters
-        The analysis model parameters
-
-    """
-    processing = construct_processing_record(
-        analysis_dispatch_inputs, **parameters
-    )
-    if docdb_record_exists(processing):
-        logger.info("Record already exists, skipping.")
-        return
+    # parse parameters and validate them
+    channel_dict = parameters["channels"]
+    # require keys of the form G|R|Iso followed by _ and a digit 0-4 (e.g. "G_0", "R_3", "Iso_2")
+    pattern = re.compile(r"^(?:G|R|Iso)_[0-4]$")
+    invalid = [k for k in channel_dict.keys() if not pattern.match(str(k))]
+    if invalid:
+        raise ValueError(f"Invalid channel keys (must match G/R/Iso_0-4): {invalid}")
+    logger.info(f"Validated channel keys: {list(channel_dict.keys())}")
 
     # parse parameters and validate them
     channel_dict = parameters["channels"]
@@ -67,6 +112,11 @@ def run_analysis(
 
     # Execute analysis and write to results folder
     # using the passed parameters
+    # Example of fetching metadata record from the dispatcher model:
+    # Returns a list of records where each record is a dictionary with the metadata. Example below:
+    #     metadata_records = get_metadata_for_records(analysis_dispatch_inputs)
+    #     first_record = metadata_records[0]
+    #     data_description = first_record["data_description"]
     # Example:
     # Use NWBZarrIO to reads
     for location in analysis_dispatch_inputs.file_location:
@@ -103,37 +153,9 @@ def run_analysis(
 
 
 if __name__ == "__main__":
-    logging.basicConfig(
-        level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+    run_analysis_jobs(
+        analysis_input_model=AnalysisInputModel,
+        analysis_output_model=AnalysisOutputModel,
+        run_function=run_analysis
     )
 
-    cli_cls = make_cli_model(DataCurationAnalysisSpecification)
-    cli_model = cli_cls()
-    logger.info(f"Command line args {cli_model.model_dump()}")
-    
-    input_model_paths = tuple(cli_model.input_directory.glob("job_dict/*")) # how should i set this as? 
-    logger.info(
-        f"Found {len(input_model_paths)} input job models to run analysis on."
-    )
-
-    for model_path in input_model_paths:
-        with open(model_path, "r") as f:
-            analysis_dispatch_inputs = AnalysisDispatchModel.model_validate(
-                json.load(f)
-            )
-        merged_parameters = get_analysis_model_parameters(
-            analysis_dispatch_inputs,
-            cli_model,
-            DataCurationAnalysisSpecification,
-            analysis_parameters_json_path=cli_model.input_directory
-            / "analysis_parameters.json",
-        )
-        analysis_specification = DataCurationAnalysisSpecification.model_validate(
-            merged_parameters
-        ).model_dump()
-        logger.info(f"Running with analysis specs {analysis_specification}")
-        run_analysis(
-            analysis_dispatch_inputs,
-            bool(cli_model.dry_run),
-            **analysis_specification,
-        )
