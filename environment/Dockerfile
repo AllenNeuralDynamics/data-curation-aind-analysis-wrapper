@@ -18,7 +18,6 @@ RUN --mount=type=secret,id=git-access-token \
     pip install -U --no-cache-dir \
     aind-analysis-arch-result-access==1.0 \
     awscli==1.38.3 \
-    boto3==1.37.3 \
     ipykernel==6.30.0 \
     ipympl==0.9.6 \
     matplotlib==3.7.5 \
@@ -26,10 +25,12 @@ RUN --mount=type=secret,id=git-access-token \
     pandas==2.3.1 \
     plotly==5.24.1 \
     psutil==7.0.0 \
-    pydantic-settings==2.9.1 \
     pypdf2==3.0.1 \
     rupture==1.4.5 \
-    s3fs==2025.2.0 \
+    analysis-pipeline-utils==0.2.1 \
+    boto3==1.42.30 \
+    pydantic-settings==2.9.1 \
+    s3fs==2026.1.0
     scikit-learn==1.7.1 \
     scipy==1.16.0 \
     seaborn==0.13.2 \
@@ -39,7 +40,6 @@ RUN --mount=type=secret,id=git-access-token \
     aind_hierarchical_bootstrap \
     -e git+https://github.com/AllenNeuralDynamics/aind-dynamic-foraging-basic-analysis.git@v0.3.35#egg=aind-dynamic-foraging-basic-analysis \
     -e git+https://github.com/AllenNeuralDynamics/aind-dynamic-foraging-data-utils.git@v0.1.36#egg=aind-dynamic-foraging-data-utils \
-    -e git+https://github.com/AllenNeuralDynamics/analysis-pipeline-utils@v0.2.1#egg=analysis-pipeline-utils
 
 COPY postInstall /
 RUN --mount=type=secret,id=secrets . /run/secrets/secrets \
