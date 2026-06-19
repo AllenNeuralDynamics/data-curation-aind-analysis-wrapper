@@ -97,7 +97,12 @@ def run_analysis(
     (kurtosis, snr) = data_curation_summary_plots.plot_kurtosis_snr_check(nwb, channel_dict, analysis_parameters.preprocessing,
                                             loc = plot_loc)
 
-    output_params = {'kurtosis': kurtosis, 'snr': snr}
+    output_params = {'kurtosis': kurtosis, 'snr': snr, 'session_id':nwb.session_id}
+    
+    pd.DataFrame([
+        output_params
+    ]).to_csv("/results/data_curation.csv", index=False)
+
 
     return output_params
 
