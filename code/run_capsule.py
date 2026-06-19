@@ -87,10 +87,14 @@ def run_analysis(
 
     # plot locations
     plot_loc = '/results/plots/'
+    data_curation_loc = '/results/data_curation/'
 
     if not os.path.exists(plot_loc):
         os.makedirs(plot_loc)
 
+
+    if not os.path.exists(data_curation_loc):
+        os.makedirs(data_curation_loc)
 
 
     # simple analyses. anything more complicated, we should refactor
@@ -101,7 +105,7 @@ def run_analysis(
     
     pd.DataFrame([
         output_params
-    ]).to_csv("/results/data_curation.csv", index=False)
+    ]).to_csv(f'{data_curation_loc}{nwb.session_id}.csv', index=False)
 
 
     return output_params
