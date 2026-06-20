@@ -63,6 +63,7 @@ def plot_kurtosis_snr_check(nwb, channel_dict, preprocessing = 'dff-bright_mc-is
     x_last = nwb.df_events.iloc[-1]["timestamps"]
 
     # plot the full trace WITH the snr/kurtosis 
+    all_data_curation = []
     for (ax, fip_i) in zip(ax_full, fip):
         
         pss.plot_fip(nwb.df_fip, fip_i, ax)
@@ -98,10 +99,12 @@ def plot_kurtosis_snr_check(nwb, channel_dict, preprocessing = 'dff-bright_mc-is
             color="black",
             bbox=dict(facecolor="white", alpha=0.8, edgecolor="none"),
         )
-        
+        all_data_curation.append([snr, kurtosis, fip_i, nwb.session_id])
 
     if loc is not None:
         plt.savefig(f'{loc}{nwb.session_id.replace("behavior_","")}_test_plot.png', bbox_inches='tight', transparent=False)
         plt.close(fig)
 
-    return kurtosis, snr
+    df_data_curation = pd.DataFrame(all_data_curation, 
+                                columns = ['snr', 'kurtosis', 'fip', 'session_id'])
+    return df_data_curation

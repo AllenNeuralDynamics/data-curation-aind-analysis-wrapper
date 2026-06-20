@@ -98,17 +98,16 @@ def run_analysis(
 
 
     # simple analyses. anything more complicated, we should refactor
-    (kurtosis, snr) = data_curation_summary_plots.plot_kurtosis_snr_check(nwb, channel_dict, analysis_parameters.preprocessing,
+    df_data_curation = data_curation_summary_plots.plot_kurtosis_snr_check(nwb, channel_dict, analysis_parameters.preprocessing,
                                             loc = plot_loc)
 
-    output_params = {'kurtosis': kurtosis, 'snr': snr, 'session_id':nwb.session_id}
+
     
-    pd.DataFrame([
-        output_params
-    ]).to_csv(f'{data_curation_loc}{nwb.session_id}.csv', index=False)
+    
+    df_data_curation.to_csv(f'{data_curation_loc}{nwb.session_id}.csv', index=False)
 
 
-    return output_params
+    return {}
 
 
 

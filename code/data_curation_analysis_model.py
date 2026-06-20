@@ -25,12 +25,13 @@ class DataCurationAnalysisSpecification(GenericModel):
 
 # outputted snr and kurtosis
 class DataCurationAnalysisOutputs(GenericModel):
-    """
-    Represents the outputs of an analysis, getting data curation info.
-    """
-    kurtosis: float=Field(default=None, description="kurtosis")
-    snr: float=Field(default=None, description="signal to noise ratio")
-    session_id: str=Field(default='', description="session_id")
+    pass
+    # """
+    # Represents the outputs of an analysis, getting data curation info.
+    # """
+    # kurtosis: float=Field(default=None, description="kurtosis")
+    # snr: float=Field(default=None, description="signal to noise ratio")
+    # session_id: str=Field(default='', description="session_id")
 
 # class DataCurationAnalysisSpecificationCLI(
 #     DataCurationAnalysisSpecification, BaseSettings, cli_parse_args=True
