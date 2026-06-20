@@ -86,7 +86,8 @@ def plot_kurtosis_snr_check(nwb, channel_dict, preprocessing = 'dff-bright_mc-is
         
         (snr, noise, peaks) = snr_kurtosis.estimate_snr(channel_trace, fps)
         kurtosis = snr_kurtosis.estimate_kurtosis(channel_trace)
-        data_cur_stats = f"SNR: {snr:.2f}\nKurtosis: {kurtosis:.2f}"
+        skewness = snr_kurtosis.estimate_skewness(channel_trace)
+        data_cur_stats = f"SNR: {snr:.2f}\nKurtosis: {kurtosis:.2f}\nSkewness: {skewness:.2f}"
         ax.text(
             0.98,
             0.95,
@@ -99,12 +100,12 @@ def plot_kurtosis_snr_check(nwb, channel_dict, preprocessing = 'dff-bright_mc-is
             color="black",
             bbox=dict(facecolor="white", alpha=0.8, edgecolor="none"),
         )
-        all_data_curation.append([snr, kurtosis, fip_i, nwb.session_id])
+        all_data_curation.append([snr, kurtosis, skewness, fip_i, nwb.session_id])
 
     if loc is not None:
         plt.savefig(f'{loc}{nwb.session_id.replace("behavior_","")}_test_plot.png', bbox_inches='tight', transparent=False)
         plt.close(fig)
 
     df_data_curation = pd.DataFrame(all_data_curation, 
-                                columns = ['snr', 'kurtosis', 'fip', 'session_id'])
+                                columns = ['snr', 'kurtosis', 'skewness','fip', 'session_id'])
     return df_data_curation
