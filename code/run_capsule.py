@@ -1,4 +1,3 @@
-from pydantic import Field
 import os 
 
 from aind_data_schema.base import GenericModel
@@ -97,14 +96,17 @@ def run_analysis(
         os.makedirs(data_curation_loc)
 
 
+    if analysis_parameters.preprocessing == "raw":
+            channel_dict_pp = channel_dict
+    else:
+        channel_dict_pp = {f"{k}_{analysis_parameters.preprocessing}": v for k, v in channel_dict.items()}
+
     # simple analyses. anything more complicated, we should refactor
-    df_data_curation = data_curation_summary_plots.plot_kurtosis_snr_check(nwb, channel_dict, analysis_parameters.preprocessing,
-                                            loc = plot_loc)
-
-
     
-    
-    df_data_curation.to_csv(f'{data_curation_loc}{nwb.session_id}.csv', index=False)
+    df_data_curation_vals = data_curation_summary_plots.get_df_data_curation(nwb, channel_dict_pp)
+    data_curation_summary_plots.plot_data_curation(nwb, channel_dict_pp, df_data_curation_vals,analysis_parameters.preprocessing, 
+         loc = plot_loc)
+    df_data_curation_vals.to_csv(f'{data_curation_loc}{nwb.session_id}.csv', index=False)
 
 
     return {}
