@@ -17,6 +17,8 @@ import matplotlib.pyplot as plt
 # ---------------------
 from aind_dynamic_foraging_basic_analysis.plot import plot_session_scroller as pss
 from aind_dynamic_foraging_basic_analysis.metrics import snr_kurtosis 
+from aind_dynamic_foraging_basic_analysis.plot import plot_foraging_session_plotly as pf_plotly
+
 
 
 def get_df_data_curation(nwb, channel_dict_pp, fps: float = 20.0):
@@ -43,6 +45,15 @@ def get_df_data_curation(nwb, channel_dict_pp, fps: float = 20.0):
         })
     return pd.DataFrame(data_curation_list)
 
+def plot_data_curation_plotly(nwb, channel_dict_pp, df_data_curation_vals,preprocessing = 'dff-bright_mc-iso-IRLS',  loc=None):
+    fip = channel_dict_pp.keys()
+    title = f'{nwb.session_id}: preprocessing = {preprocessing}'
+    fig = pf_plotly.plot_session_in_time_nwb_plotly( 
+        [nwb], fip=fip, adjust_time=True, title=title, smooth_factor=5
+    )
+    if loc is not None:
+        fig.write_html(f'{loc}{nwb.session_id.replace("behavior_","")}_data_curation.html')
+    return
 
 def plot_data_curation(nwb, channel_dict_pp, df_data_curation_vals,preprocessing = 'dff-bright_mc-iso-IRLS',  loc=None):
     # fip is channels + preprocessing

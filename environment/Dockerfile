@@ -21,6 +21,7 @@ RUN --mount=type=secret,id=git-access-token \
     ipympl==0.9.6 \
     matplotlib==3.7.5 \
     numpy==1.26.4 \
+    nbformat==5.10.4 \
     pandas==2.3.1 \
     plotly==5.24.1 \
     psutil==7.0.0 \
@@ -38,7 +39,7 @@ RUN --mount=type=secret,id=git-access-token \
     xarray==2025.7.1 \
     zarr==2.18.6 \
     aind_hierarchical_bootstrap \
-    -e git+https://github.com/AllenNeuralDynamics/aind-dynamic-foraging-basic-analysis.git@v0.3.42#egg=aind-dynamic-foraging-basic-analysis \
+    -e git+https://github.com/AllenNeuralDynamics/aind-dynamic-foraging-basic-analysis.git@vfix_plotly_code#egg=aind-dynamic-foraging-basic-analysis \
     -e git+https://github.com/AllenNeuralDynamics/aind-dynamic-foraging-data-utils.git@v0.1.36#egg=aind-dynamic-foraging-data-utils \
     -e git+https://github.com/AllenNeuralDynamics/rachel-analysis-utils@8b878d2d22b34ac9a57cd7bc2fee4d0dab1639bc#egg=rachel-analysis-utils
 

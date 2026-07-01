@@ -104,7 +104,7 @@ def run_analysis(
     # simple analyses. anything more complicated, we should refactor
     
     df_data_curation_vals = data_curation_summary_plots.get_df_data_curation(nwb, channel_dict_pp)
-    data_curation_summary_plots.plot_data_curation(nwb, channel_dict_pp, df_data_curation_vals,analysis_parameters.preprocessing, 
+    data_curation_summary_plots.plot_data_curation_plotly(nwb, channel_dict_pp, df_data_curation_vals,analysis_parameters.preprocessing, 
          loc = plot_loc)
     df_data_curation_vals.to_csv(f'{data_curation_loc}{nwb.session_id}.csv', index=False)
 
