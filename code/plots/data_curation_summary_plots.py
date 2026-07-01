@@ -46,11 +46,35 @@ def get_df_data_curation(nwb, channel_dict_pp, fps: float = 20.0):
     return pd.DataFrame(data_curation_list)
 
 def plot_data_curation_plotly(nwb, channel_dict_pp, df_data_curation_vals,preprocessing = 'dff-bright_mc-iso-IRLS',  loc=None):
-    fip = channel_dict_pp.keys()
+    fip_list = channel_dict_pp.keys()
     title = f'{nwb.session_id}: preprocessing = {preprocessing}'
     fig = pf_plotly.plot_session_in_time_nwb_plotly( 
-        [nwb], fip=fip, adjust_time=True, title=title, smooth_factor=5
+        [nwb], fip=fip_list, adjust_time=False, title=title, smooth_factor=5
     )
+      # Add data curation stats as text annotations to each subplot
+    for trace in fig.data:
+        if trace.name not in fip_list:
+            continue
+
+        data_curation_row = df_data_curation_vals.query(f"fip == '{trace.name}'").iloc[0]
+        stat_cols = [col for col in data_curation_row.index if col not in ['fip', 'session_id']]
+        data_cur_stats = "<br>".join([f"{col}: {data_curation_row[col]:.2f}" for col in stat_cols])
+        
+        trace.name = f"{trace.name.split('_dff')[0]}: {channel_dict_pp[trace.name]}"
+        fig.add_annotation(
+            x=0.995,
+            y=np.nanmax(trace.y),
+            xref="paper",
+            yref="y",
+            text=data_cur_stats,
+            showarrow=False,
+            xanchor="right",
+            yanchor="top",
+            xshift=-5,
+            yshift=-5
+        )
+        
+    
     if loc is not None:
         fig.write_html(f'{loc}{nwb.session_id.replace("behavior_","")}_data_curation.html')
     return
