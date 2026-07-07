@@ -90,7 +90,7 @@ def plot_data_curation(nwb, channel_dict_pp, df_data_curation_vals,preprocessing
     n_full = len(fip)
 
     total_plots = n_zoom + n_full
-    fig, ax = plt.subplots(total_plots, 1, figsize=(30, 2 * total_plots))
+    fig, ax = plt.subplots(total_plots, 1, figsize=(30, 4 * total_plots))
     
     # add title of session_ID and preprocessing type. 
 
@@ -145,8 +145,8 @@ def plot_data_curation(nwb, channel_dict_pp, df_data_curation_vals,preprocessing
             va="top",
             fontsize=18,
             fontweight="bold",
-            color="black",
-            bbox=dict(facecolor="white", alpha=0.8, edgecolor="none"),
+            zorder=20,
+            bbox=dict(facecolor="white", alpha=1.0, edgecolor="none"),
         )
 
     if loc is not None:

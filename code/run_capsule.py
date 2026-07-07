@@ -85,7 +85,7 @@ def run_analysis(
     nwb = nwb_utils_rachel.attach_dfs(nwbfile)
 
     # plot locations
-    plot_loc = '/results/plots/'
+    plot_loc = '/results/individual_plots/'
     data_curation_loc = '/results/data_curation/'
 
     if not os.path.exists(plot_loc):
