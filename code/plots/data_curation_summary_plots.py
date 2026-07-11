@@ -150,7 +150,7 @@ def plot_data_curation(nwb, channel_dict_pp, df_data_curation_vals,preprocessing
         )
 
     if loc is not None:
-        plt.savefig(f'{loc}{nwb.session_id.replace("behavior_","")}_test_plot.png', bbox_inches='tight', transparent=False)
+        plt.savefig(f'{loc}{nwb.session_id.replace("behavior_","")}_static_plot.png', bbox_inches='tight', transparent=False)
         plt.close(fig)
 
     return fig

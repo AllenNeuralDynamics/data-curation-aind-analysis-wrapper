@@ -9,7 +9,7 @@
         "c6eb823c-1488-4f1f-b066-67c6a839b41d"
     ],
     "file_location": [
-            "s3://codeocean-s3datasetsbucket-1u41qdg42ur9/c04e0c23-2286-4731-8777-377ab6e68f88/nwb/behavior_754280_2024-11-27_11-14-15.nwb"
+        "s3://codeocean-s3datasetsbucket-1u41qdg42ur9/c04e0c23-2286-4731-8777-377ab6e68f88/nwb/behavior_754280_2024-11-27_11-14-15.nwb"
     ],
     "distributed_parameters": null,
     "group_metadata": null,
@@ -33,9 +33,8 @@
             "name":"hello analysis framework!", 
             "channels":{
                 "G_0":"Fake_channel_to_test!",
-                "Iso_0":"Fake channel_to_test 2"
-            },
-            "preprocessing": "raw"
+                "G_1":"Fake channel_to_test 2"
+            }
         },
         "core_dependency": null
     }
