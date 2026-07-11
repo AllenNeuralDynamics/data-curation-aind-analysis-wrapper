@@ -76,7 +76,7 @@ def plot_data_curation_plotly(nwb, channel_dict_pp, df_data_curation_vals,prepro
         
     
     if loc is not None:
-        fig.write_html(f'{loc}{nwb.session_id.replace("behavior_","")}_data_curation.html')
+        fig.write_html(f'{loc}{nwb.session_id.replace("behavior_","")}_data_curation.html',full_html=False, include_plotlyjs='cdn')
     return
 
 def plot_data_curation(nwb, channel_dict_pp, df_data_curation_vals,preprocessing = 'dff-bright_mc-iso-IRLS',  loc=None):
