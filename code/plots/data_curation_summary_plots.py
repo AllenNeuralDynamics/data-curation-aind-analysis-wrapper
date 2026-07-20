@@ -41,6 +41,8 @@ def get_df_data_curation(nwb, channel_dict_pp, fps: float = 20.0):
         data_curation_list.append({
             'snr': snr,
             'snr_envelope' : snr_envelope,
+            "kurtosis":kurtosis,
+            "skewness":skewness,
             'fip': fip,
             'session_id': nwb.session_id
         })
