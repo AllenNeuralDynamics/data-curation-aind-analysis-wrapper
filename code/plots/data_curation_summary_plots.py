@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 from aind_dynamic_foraging_basic_analysis.plot import plot_session_scroller as pss
 from aind_dynamic_foraging_basic_analysis.metrics import snr_kurtosis 
 from aind_dynamic_foraging_basic_analysis.plot import plot_foraging_session_plotly as pf_plotly
-
+from aind_dynamic_foraging_basic_analysis.metrics.snr_envelope_rr import EnvelopeRRSNR
 
 
 def get_df_data_curation(nwb, channel_dict_pp, fps: float = 20.0):
@@ -34,12 +34,13 @@ def get_df_data_curation(nwb, channel_dict_pp, fps: float = 20.0):
         channel_trace = df_channel_time_filtered['data'].values
 
         (snr, noise, peaks) = snr_kurtosis.estimate_snr(channel_trace, fps)
+        estimator = EnvelopeRRSNR(fps=20.0)
+        (snr_envelope, noise_envelope, peaks_envelope) = estimator.estimate(channel_trace)
         kurtosis = snr_kurtosis.estimate_kurtosis(channel_trace)
         skewness = snr_kurtosis.estimate_skewness(channel_trace)
         data_curation_list.append({
             'snr': snr,
-            'kurtosis': kurtosis,
-            'skewness': skewness,
+            'snr_envelope' : snr_envelope,
             'fip': fip,
             'session_id': nwb.session_id
         })
