@@ -1,24 +1,24 @@
 {
-    "asset_name": [
-        "behavior_754280_2024-11-27_11-14-15"    
-    ],
     "s3_location": [
-        "s3://codeocean-s3datasetsbucket-1u41qdg42ur9/8351747a-f472-43f9-a53b-cd1f9aa35288"
+        "s3://codeocean-s3datasetsbucket-1u41qdg42ur9/4c2d2a94-59f0-4331-a32c-2440a95e6925"
+    ],
+    "asset_name": [
+        "behavior_788175_2025-07-14_14-14-15_processed_2026-04-05_23-35-31"
     ],
     "docdb_record_id": [
-        "c6eb823c-1488-4f1f-b066-67c6a839b41d"
+        "2b600188-5782-47d6-9d48-e42abb9cfe07"
     ],
     "file_location": [
-        "s3://codeocean-s3datasetsbucket-1u41qdg42ur9/c04e0c23-2286-4731-8777-377ab6e68f88/nwb/behavior_754280_2024-11-27_11-14-15.nwb"
+        "s3://codeocean-s3datasetsbucket-1u41qdg42ur9/4c2d2a94-59f0-4331-a32c-2440a95e6925/fib.nwb.zarr"
     ],
     "distributed_parameters": null,
     "group_metadata": null,
-    "query": "{\"subject.subject_id\": \"820117\", \"data_description.data_level\": \"derived\", \"data_description.modality.abbreviation\": \"behavior\"}",
+    "query": null,
     "analysis_code": {
         "object_type": "Code",
-        "url": "https://codeocean.allenneuraldynamics.org/capsule/4544861",
-        "name": null,
-        "version": "ad6db0dca9e5fffc1544686c01f39aac1e46c841",
+        "url": "https://codeocean.allenneuraldynamics.org/capsule/6449063",
+        "name": "data-curation-aind-analysis-wrapper",
+        "version": "3c765f63845a3be4bc62d8112a7bfb7d6dccd96d",
         "container": null,
         "run_script": "code/run",
         "language": null,
@@ -26,15 +26,22 @@
         "input_data": [
             {
                 "object_type": "Data asset",
-                "url": "s3://codeocean-s3datasetsbucket-1u41qdg42ur9/8351747a-f472-43f9-a53b-cd1f9aa35288"
+                "url": "s3://codeocean-s3datasetsbucket-1u41qdg42ur9/4c2d2a94-59f0-4331-a32c-2440a95e6925"
             }
         ],
         "parameters": {
-            "name":"hello analysis framework!", 
-            "channels":{
-                "G_0":"Fake_channel_to_test!",
-                "G_1":"Fake channel_to_test 2"
-            }
+            "dry run": "1",
+            "name": "NAc/VTA cohort 3",
+            "channels": {
+                "G_0": "NAcc: Calcium",
+                "R_0": "NAcc: DA",
+                "G_1": "VTA: Calcium"
+            },
+            "fitted_model": "QLearning_L1F1_CK1_softmax",
+            "preprocessing": "dff-bright_mc-iso-IRLS",
+            "file_location": [
+                "s3://codeocean-s3datasetsbucket-1u41qdg42ur9/4c2d2a94-59f0-4331-a32c-2440a95e6925/fib.nwb.zarr"
+            ]
         },
         "core_dependency": null
     }
