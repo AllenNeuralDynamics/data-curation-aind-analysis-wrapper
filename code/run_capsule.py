@@ -14,6 +14,7 @@ from analysis_pipeline_utils.utils_analysis_wrapper import (
 from data_curation_analysis_model import (DataCurationAnalysisOutputs,
                                     DataCurationAnalysisSpecification)
 
+from aind_nwb_utils import NWBCombineIO
 from hdmf_zarr import NWBZarrIO
 
 
@@ -74,12 +75,17 @@ def run_analysis(
     #     metadata_records = get_metadata_for_records(analysis_dispatch_inputs)
     #     first_record = metadata_records[0]
     #     data_description = first_record["data_description"]
-    # Example:
-    # Use NWBZarrIO to reads
-    for location in analysis_dispatch_inputs.file_location:
-        with NWBZarrIO(location, 'r') as io:
-            nwbfile = io.read()
-        
+    nwb_paths = analysis_dispatch_inputs.file_location
+    fiber_path = next((p for p in nwb_paths if p.endswith("fib.nwb.zarr")), None)
+    behavior_path = next((p for p in nwb_paths if p.endswith("behavior.nwb.zarr")), None)
+
+    if fiber_path and behavior_path:
+        with NWBCombineIO(behavior_path, [fiber_path]) as (nwbfile, main_io):
+            nwbfile = main_io.read()
+    else:
+        for location in nwb_paths:
+            with NWBZarrIO(location, 'r') as io:
+                nwbfile = io.read()
 
     # nwb processing code
     nwb = nwb_utils_rachel.attach_dfs(nwbfile)
