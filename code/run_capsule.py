@@ -16,7 +16,8 @@ from data_curation_analysis_model import (DataCurationAnalysisOutputs,
 
 from aind_nwb_utils import NWBCombineIO
 from hdmf_zarr import NWBZarrIO
-
+from aind_pavlovian_data_utils import pavlovian_analysis as pa
+from aind_pavlovian_data_utils.nwb_utils import parse_session_name
 
 ANALYSIS_BUCKET = os.getenv("ANALYSIS_BUCKET")
 # logger = logging.getLogger(__name__)
@@ -82,13 +83,17 @@ def run_analysis(
     if fiber_path and behavior_path:
         with NWBCombineIO(behavior_path, [fiber_path]) as (nwbfile, main_io):
             nwbfile = main_io.read()
+        df_events, df_fip, meta = pa.load_pavlovian_dfs(
+            nwbfile, preprocessing=analysis_parameters.preprocessing)
+        nwb = nwbfile
+        nwb.df_fip = df_fip
+        nwb.df_events = df_events
     else:
         for location in nwb_paths:
             with NWBZarrIO(location, 'r') as io:
                 nwbfile = io.read()
-
-    # nwb processing code
-    nwb = nwb_utils_rachel.attach_dfs(nwbfile)
+        # nwb processing code
+        nwb = nwb_utils_rachel.attach_dfs(nwbfile)
 
     # plot locations
     plot_loc = '/results/individual_plots/'
