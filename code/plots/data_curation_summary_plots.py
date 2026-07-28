@@ -55,10 +55,11 @@ def plot_data_curation_plotly(nwb, channel_dict_pp, df_data_curation_vals,prepro
         [nwb], fip=fip_list, adjust_time=False, title=title, smooth_factor=5
     )
       # Add data curation stats as text annotations to each subplot
+    plotted = []
     for trace in fig.data:
-        if trace.name not in fip_list:
+        if trace.name not in fip_list or trace.name in plotted:
             continue
-
+        plotted.append(trace.name)
         data_curation_row = df_data_curation_vals.query(f"fip == '{trace.name}'").iloc[0]
         stat_cols = [col for col in data_curation_row.index if col not in ['fip', 'session_id']]
         data_cur_stats = "<br>".join([f"{col}: {data_curation_row[col]:.2f}" for col in stat_cols])
