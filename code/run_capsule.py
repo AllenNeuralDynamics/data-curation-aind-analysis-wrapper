@@ -88,12 +88,15 @@ def run_analysis(
         nwb = nwbfile
         nwb.df_fip = df_fip
         nwb.df_events = df_events
+        nwb.meta = meta
+        pav_flag = True
     else:
         for location in nwb_paths:
             with NWBZarrIO(location, 'r') as io:
                 nwbfile = io.read()
         # nwb processing code
         nwb = nwb_utils_rachel.attach_dfs(nwbfile)
+        pav_flag = False
 
     # plot locations
     plot_loc = '/results/individual_plots/'
@@ -115,8 +118,9 @@ def run_analysis(
     # simple analyses. anything more complicated, we should refactor
     
     df_data_curation_vals = data_curation_summary_plots.get_df_data_curation(nwb, channel_dict_pp)
-    data_curation_summary_plots.plot_data_curation_plotly(nwb, channel_dict_pp, df_data_curation_vals,analysis_parameters.preprocessing, 
-         loc = plot_loc)
+    
+    data_curation_summary_plots.plot_data_curation_plotly(nwb, channel_dict_pp, df_data_curation_vals, analysis_parameters.preprocessing, 
+         pav_flag, loc = plot_loc)
     df_data_curation_vals.to_csv(f'{data_curation_loc}{nwb.session_id}.csv', index=False)
 
 

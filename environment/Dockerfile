@@ -40,7 +40,7 @@ RUN --mount=type=secret,id=git-access-token \
     zarr==2.18.6 \
     aind_hierarchical_bootstrap \
     -e git+https://github.com/AllenNeuralDynamics/aind-nwb-utils.git@v0.2.6#egg=aind_nwb_utils \
-    -e git+https://github.com/AllenNeuralDynamics/aind-pavlovian-data-utils@rachel_cleanup#egg=aind-pavlovian-data-utils \
+    -e git+https://github.com/AllenNeuralDynamics/aind-pavlovian-data-utils@df7ab2b1d2a68b19304a7a01065a6414330b3d40#egg=aind-pavlovian-data-utils \
     -e git+https://github.com/AllenNeuralDynamics/aind-dynamic-foraging-basic-analysis.git@8d5e1ae0d0a860c3e2918eb712211623cfe410a0#egg=aind-dynamic-foraging-basic-analysis \
     -e git+https://github.com/AllenNeuralDynamics/aind-dynamic-foraging-data-utils.git@v0.1.36#egg=aind-dynamic-foraging-data-utils \
     -e git+https://github.com/AllenNeuralDynamics/rachel-analysis-utils@8b878d2d22b34ac9a57cd7bc2fee4d0dab1639bc#egg=rachel-analysis-utils

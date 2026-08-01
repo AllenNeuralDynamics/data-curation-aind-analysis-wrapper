@@ -19,6 +19,7 @@ from aind_dynamic_foraging_basic_analysis.plot import plot_session_scroller as p
 from aind_dynamic_foraging_basic_analysis.metrics import snr_kurtosis 
 from aind_dynamic_foraging_basic_analysis.plot import plot_foraging_session_plotly as pf_plotly
 from aind_dynamic_foraging_basic_analysis.metrics.snr_envelope_rr import EnvelopeRRSNR
+from aind_pavlovian_data_utils import pavlovian_analysis as pa
 
 
 def get_df_data_curation(nwb, channel_dict_pp, fps: float = 20.0):
@@ -48,23 +49,33 @@ def get_df_data_curation(nwb, channel_dict_pp, fps: float = 20.0):
         })
     return pd.DataFrame(data_curation_list)
 
-def plot_data_curation_plotly(nwb, channel_dict_pp, df_data_curation_vals,preprocessing = 'dff-bright_mc-iso-IRLS',  loc=None):
+def plot_data_curation_plotly(nwb, channel_dict_pp, df_data_curation_vals, preprocessing='dff-bright_mc-iso-IRLS', pav_flag=False, loc=None):
     fip_list = channel_dict_pp.keys()
     title = f'{nwb.session_id}: preprocessing = {preprocessing}'
-    fig = pf_plotly.plot_session_in_time_nwb_plotly( 
-        [nwb], fip=fip_list, adjust_time=False, title=title, smooth_factor=5
-    )
-      # Add data curation stats as text annotations to each subplot
+
+    if pav_flag:
+        channels = {k.replace(f"_{preprocessing}", ""): v for k, v in channel_dict_pp.items()}
+        fig = pa.plot_pavlovian_session_nwb_plotly(nwb, channels=channels)
+        active_keys = channels
+        fip_for_trace = {stripped: full for stripped, full in zip(channels, fip_list)}
+    else:
+        fig = pf_plotly.plot_session_in_time_nwb_plotly(
+            [nwb], fip=fip_list, adjust_time=False, title=title, smooth_factor=5
+        )
+        active_keys = channel_dict_pp
+        fip_for_trace = {k: k for k in fip_list}
+
+    # Add data curation stats as text annotations to each subplot
     plotted = []
     for trace in fig.data:
-        if trace.name not in fip_list or trace.name in plotted:
+        if trace.name not in active_keys or trace.name in plotted:
             continue
         plotted.append(trace.name)
-        data_curation_row = df_data_curation_vals.query(f"fip == '{trace.name}'").iloc[0]
+        data_curation_row = df_data_curation_vals.query(f"fip == '{fip_for_trace[trace.name]}'").iloc[0]
         stat_cols = [col for col in data_curation_row.index if col not in ['fip', 'session_id']]
         data_cur_stats = "<br>".join([f"{col}: {data_curation_row[col]:.2f}" for col in stat_cols])
-        
-        trace.name = f"{trace.name.split('_dff')[0]}: {channel_dict_pp[trace.name]}"
+
+        trace.name = f"{trace.name.split('_dff')[0]}: {active_keys[trace.name]}"
         fig.add_annotation(
             x=0.995,
             y=np.nanmax(trace.y),
@@ -77,10 +88,9 @@ def plot_data_curation_plotly(nwb, channel_dict_pp, df_data_curation_vals,prepro
             xshift=-5,
             yshift=-5
         )
-        
-    
+
     if loc is not None:
-        fig.write_html(f'{loc}{nwb.session_id.replace("behavior_","")}_data_curation.html',full_html=False, include_plotlyjs='cdn')
+        fig.write_html(f'{loc}{nwb.session_id.replace("behavior_","")}_data_curation.html', full_html=False, include_plotlyjs='cdn')
     return
 
 def plot_data_curation(nwb, channel_dict_pp, df_data_curation_vals,preprocessing = 'dff-bright_mc-iso-IRLS',  loc=None):
