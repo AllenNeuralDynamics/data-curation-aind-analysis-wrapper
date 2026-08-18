@@ -98,6 +98,7 @@ def run_analysis(
         nwb = nwb_utils_rachel.attach_dfs(nwbfile)
         pav_flag = False
 
+    print(f"loading NWB : {nwb.session_id}")
     # plot locations
     plot_loc = '/results/individual_plots/'
     data_curation_loc = '/results/data_curation/'
