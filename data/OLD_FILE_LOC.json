@@ -1,4 +1,19 @@
 {
+    # normal
+            "s3://codeocean-s3datasetsbucket-1u41qdg42ur9/0d22d5a9-0f4d-4c09-80fd-1bfb32384340/nwb/behavior_746345_2024-12-06_09-23-08.nwb"    
+    # really big jumps
+
+            "s3://codeocean-s3datasetsbucket-1u41qdg42ur9/5912882f-edb8-48be-bbb5-daadfa1e48d2/nwb/behavior_746346_2025-02-20_09-38-13.nwb"
+
+            
+    # PAVLOVIAN
+    [
+            "s3://codeocean-s3datasetsbucket-1u41qdg42ur9/9a6857c0-e1e6-4968-a7ce-16485c47cf9d/behavior.nwb.zarr",
+        "s3://codeocean-s3datasetsbucket-1u41qdg42ur9/5cd67c7d-929e-4e40-ac48-97c06695b0b7/fib.nwb.zarr"
+    ],
+            
+
+
         "s3://codeocean-s3datasetsbucket-1u41qdg42ur9/1be57ae9-e9fb-44e6-8492-f14c9292e7ec/nwb/behavior_800886_2025-08-18_13-14-52.nwb"
 
 
