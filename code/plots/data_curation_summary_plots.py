@@ -77,10 +77,10 @@ def plot_data_curation_plotly(nwb, channel_dict_pp, df_data_curation_vals, prepr
 
         trace.name = f"{trace.name.split('_dff')[0]}: {active_keys[trace.name]}"
         fig.add_annotation(
-            x=0.995,
+            x=0.90,
             y=np.nanmax(trace.y),
             xref="paper",
-            yref="y",
+            yref=trace.yaxis,
             text=data_cur_stats,
             showarrow=False,
             xanchor="right",
@@ -93,9 +93,11 @@ def plot_data_curation_plotly(nwb, channel_dict_pp, df_data_curation_vals, prepr
         fig.write_html(f'{loc}{nwb.session_id.replace("behavior_","")}_data_curation.html', full_html=False, include_plotlyjs='cdn')
     return
 
-def plot_data_curation(nwb, channel_dict_pp, df_data_curation_vals,preprocessing = 'dff-bright_mc-iso-IRLS',  loc=None):
+def plot_data_curation(nwb, channel_dict_pp, df_data_curation_vals,preprocessing = 'dff-bright_mc-iso-IRLS',  pav_flag = False, loc=None):
     # fip is channels + preprocessing
-
+    if pav_flag:
+        return
+        
     fip = channel_dict_pp.keys()
 
     # top: zoomed view (1 event row + len(fip) traces)
@@ -151,7 +153,7 @@ def plot_data_curation(nwb, channel_dict_pp, df_data_curation_vals,preprocessing
         data_cur_stats = "\n".join([f"{col}: {data_curation_row[col]:.2f}" for col in stat_cols])
         
         ax.text(
-            0.98,
+            0.80,
             0.95,
             data_cur_stats,
             transform=ax.transAxes,
