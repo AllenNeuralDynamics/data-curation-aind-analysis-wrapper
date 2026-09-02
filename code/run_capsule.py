@@ -126,7 +126,7 @@ def run_analysis(
     df_data_curation_vals.to_csv(f'{aggregate_loc}{session_id}.csv', index=False)
     # save nwb so i can make lifetime plots later. a bit of a hack to get the ses_idx
     print(f"now saving {nwb.session_id}")
-    nwb.df_fip = nwb.df_fip[::50]
+    nwb.df_fip = nwb.df_fip[::100]
     dummy_nwb = nwb_utils_rachel.dummy_nwb(nwb.df_trials, nwb.df_events, nwb.df_fip)
     dummy_nwb.session_id = session_id
     dummy_nwb.save(f'{aggregate_loc}')
