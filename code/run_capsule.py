@@ -102,10 +102,9 @@ def run_analysis(
     print(f"loading NWB : {nwb.session_id}")
     # plot locations
     plot_loc = '/results/individual_plots/'
-    data_curation_loc = '/results/aggregate_results/data_curation/'
-    nwb_loc = '/results/aggregate_results/data/'
+    aggregate_loc = '/results/aggregate_results/'
 
-    for path in [plot_loc, data_curation_loc, nwb_loc]: 
+    for path in [plot_loc, aggregate_loc]: 
         if not os.path.exists(path):
             os.makedirs(path)
 
@@ -124,10 +123,12 @@ def run_analysis(
          pav_flag, loc = plot_loc)
 
     session_id = nwb.session_id.replace("behavior_","")
-    df_data_curation_vals.to_csv(f'{data_curation_loc}{session_id}.csv', index=False)
+    df_data_curation_vals.to_csv(f'{aggregate_loc}{session_id}.csv', index=False)
     # save nwb so i can make lifetime plots later. a bit of a hack to get the ses_idx
-    nwb_list = nwb_utils_rachel.get_dummy_nwbs(nwb.df_trials, nwb.df_events, nwb.df_fip)
-    nwb_utils_rachel.save_nwb_list(nwb_list, nwb_loc, df_curation = None, df_sess = None)
+    print(f"now saving {nwb.session_id}")
+    dummy_nwb = nwb_utils_rachel.dummy_nwb(nwb.df_trials, nwb.df_events, nwb.df_fip)
+    dummy_nwb.session_id = session_id
+    dummy_nwb.save(f'{aggregate_loc}')
 
 
     return {}
