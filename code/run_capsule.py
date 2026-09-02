@@ -17,7 +17,7 @@ from data_curation_analysis_model import (DataCurationAnalysisOutputs,
 from aind_nwb_utils import NWBCombineIO
 from hdmf_zarr import NWBZarrIO
 from aind_pavlovian_data_utils import pavlovian_analysis as pa
-from aind_pavlovian_data_utils.nwb_utils import parse_session_name
+from aind_pavlovian_data_utils.nwb_utils import parse_session_name, create_df_trials
 
 ANALYSIS_BUCKET = os.getenv("ANALYSIS_BUCKET")
 # logger = logging.getLogger(__name__)
@@ -87,6 +87,7 @@ def run_analysis(
             nwbfile, preprocessing=analysis_parameters.preprocessing)
         nwb = nwbfile
         nwb.df_fip = df_fip
+        nwb.df_trials = create_df_trials(nwbfile)
         nwb.df_events = df_events
         nwb.meta = meta
         pav_flag = True
@@ -101,15 +102,12 @@ def run_analysis(
     print(f"loading NWB : {nwb.session_id}")
     # plot locations
     plot_loc = '/results/individual_plots/'
-    data_curation_loc = '/results/data_curation/'
+    data_curation_loc = '/results/aggregate_results/data_curation/'
+    nwb_loc = '/results/aggregate_results/data/'
 
-    if not os.path.exists(plot_loc):
-        os.makedirs(plot_loc)
-
-
-    if not os.path.exists(data_curation_loc):
-        os.makedirs(data_curation_loc)
-
+    for path in [plot_loc, data_curation_loc, nwb_loc]: 
+        if not os.path.exists(path):
+            os.makedirs(path)
 
     if analysis_parameters.preprocessing == "raw":
             channel_dict_pp = channel_dict
@@ -124,7 +122,12 @@ def run_analysis(
          pav_flag, loc = plot_loc)
     data_curation_summary_plots.plot_data_curation(nwb, channel_dict_pp, df_data_curation_vals, analysis_parameters.preprocessing, 
          pav_flag, loc = plot_loc)
-    df_data_curation_vals.to_csv(f'{data_curation_loc}{nwb.session_id}.csv', index=False)
+
+    session_id = nwb.session_id.replace("behavior_","")
+    df_data_curation_vals.to_csv(f'{data_curation_loc}{session_id}.csv', index=False)
+    # save nwb so i can make lifetime plots later. a bit of a hack to get the ses_idx
+    nwb_list = nwb_utils_rachel.get_dummy_nwbs(nwb.df_trials, nwb.df_events, nwb.df_fip)
+    nwb_utils_rachel.save_nwb_list(nwb_list, nwb_loc, df_curation = None, df_sess = None)
 
 
     return {}
