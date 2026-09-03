@@ -1,4 +1,8 @@
 {
+    # buggy short session 
+    
+                "s3://codeocean-s3datasetsbucket-1u41qdg42ur9/9aadd85c-5409-4f5a-b87e-846afe7bf8ca/nwb/behavior_820691_2025-12-23_10-44-31.nwb"    
+
     # normal
             "s3://codeocean-s3datasetsbucket-1u41qdg42ur9/0d22d5a9-0f4d-4c09-80fd-1bfb32384340/nwb/behavior_746345_2024-12-06_09-23-08.nwb"    
             
@@ -16,6 +20,7 @@
             
 
 
+    
         "s3://codeocean-s3datasetsbucket-1u41qdg42ur9/1be57ae9-e9fb-44e6-8492-f14c9292e7ec/nwb/behavior_800886_2025-08-18_13-14-52.nwb"
 
 
