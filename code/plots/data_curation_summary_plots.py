@@ -26,30 +26,32 @@ def get_df_data_curation(nwb, channel_dict_pp, fps: float = 20.0):
     data_curation_list = []
     for fip in channel_dict_pp.keys():
         df_channel = nwb.df_fip.query(f"event == '{fip}'")
-
-        # Filter the DataFrame to look at data after time = 0 to 500 seconds before end of trial
-        last_timestamps = df_channel.iloc[-1].timestamps - 500 \
-                if df_channel.iloc[-1].timestamps - 500 > 0 \
-                else df_channel.iloc[-1].timestamps
-        df_channel_time_filtered = df_channel.query(f"timestamps > 0 and timestamps < {last_timestamps}")
         
-        # Extract the trace data as a NumPy array
-        channel_trace = df_channel_time_filtered['data'].values
-        
+        if len(df_channel) > 0:
 
-        (snr, noise, peaks) = snr_kurtosis.estimate_snr(channel_trace, fps)
-        estimator = EnvelopeRRSNR(fps=20.0)
-        (snr_envelope, noise_envelope, peaks_envelope) = estimator.estimate(channel_trace)
-        kurtosis = snr_kurtosis.estimate_kurtosis(channel_trace)
-        skewness = snr_kurtosis.estimate_skewness(channel_trace)
-        data_curation_list.append({
-            'snr': snr,
-            'snr_envelope' : snr_envelope,
-            "kurtosis":kurtosis,
-            "skewness":skewness,
-            'fip': fip,
-            'session_id': nwb.session_id
-        })
+            # Filter the DataFrame to look at data after time = 0 to 500 seconds before end of trial
+            last_timestamps = df_channel.iloc[-1].timestamps - 500 \
+                    if df_channel.iloc[-1].timestamps - 500 > 0 \
+                    else df_channel.iloc[-1].timestamps
+            df_channel_time_filtered = df_channel.query(f"timestamps > 0 and timestamps < {last_timestamps}")
+            
+            # Extract the trace data as a NumPy array
+            channel_trace = df_channel_time_filtered['data'].values
+            
+
+            (snr, noise, peaks) = snr_kurtosis.estimate_snr(channel_trace, fps)
+            estimator = EnvelopeRRSNR(fps=20.0)
+            (snr_envelope, noise_envelope, peaks_envelope) = estimator.estimate(channel_trace)
+            kurtosis = snr_kurtosis.estimate_kurtosis(channel_trace)
+            skewness = snr_kurtosis.estimate_skewness(channel_trace)
+            data_curation_list.append({
+                'snr': snr,
+                'snr_envelope' : snr_envelope,
+                "kurtosis":kurtosis,
+                "skewness":skewness,
+                'fip': fip,
+                'session_id': nwb.session_id
+            })
     return pd.DataFrame(data_curation_list)
 
 def plot_data_curation_plotly(nwb, channel_dict_pp, df_data_curation_vals, preprocessing='dff-bright_mc-iso-IRLS', pav_flag=False, loc=None):
