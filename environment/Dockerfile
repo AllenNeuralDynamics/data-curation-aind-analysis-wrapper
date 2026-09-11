@@ -28,7 +28,7 @@ RUN --mount=type=secret,id=git-access-token \
     psutil==7.0.0 \
     pypdf2==3.0.1 \
     rupture==1.4.5 \
-    analysis-pipeline-utils==0.2.6 \
+    analysis-pipeline-utils==0.2.7 \
     boto3==1.42.30 \
     pydantic-settings==2.9.1 \
     s3fs==2026.1.0 \
