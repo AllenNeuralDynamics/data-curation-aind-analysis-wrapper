@@ -1,41 +1,43 @@
-import os 
-
+import os
+import logging
+ 
 from aind_data_schema.base import GenericModel
-
+ 
 from analysis_pipeline_utils.metadata import get_metadata_for_records
-
+ 
 from analysis_pipeline_utils.analysis_dispatch_model import \
     AnalysisDispatchModel
-
+ 
 from analysis_pipeline_utils.utils_analysis_wrapper import (
     run_analysis_jobs)
-
-
+ 
+ 
 from data_curation_analysis_model import (DataCurationAnalysisOutputs,
                                     DataCurationAnalysisSpecification)
-
+ 
 from aind_nwb_utils import NWBCombineIO
 from hdmf_zarr import NWBZarrIO
 from aind_pavlovian_data_utils import pavlovian_analysis as pa
 from aind_pavlovian_data_utils.nwb_utils import parse_session_name, create_df_trials
-
+ 
 ANALYSIS_BUCKET = os.getenv("ANALYSIS_BUCKET")
-# logger = logging.getLogger(__name__)
-
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+ 
 # for analysis code
 import numpy as np
-import pandas as pd 
+import pandas as pd
 from plots import data_curation_summary_plots
 from rachel_analysis_utils import nwb_utils as nwb_utils_rachel
 import re
-
-
-
+ 
+ 
+ 
 from dotenv import load_dotenv
-
+ 
 # TODO: use pydantic settings instead
 load_dotenv("settings.env")
-
+ 
 # ======================================================================
 # USER MUST EDIT THIS SECTION
 #
@@ -44,21 +46,21 @@ load_dotenv("settings.env")
 #
 # Do NOT modify any code outside this section except run_analysis().
 # ======================================================================
-
-
-
-
-
+ 
+ 
+ 
+ 
+ 
 AnalysisInputModel = DataCurationAnalysisSpecification
 AnalysisOutputModel = DataCurationAnalysisOutputs
-
-
+ 
+ 
 ### USER EDITABLE FUNCTION WHERE ANALYSIS IS EXECUTED
 def run_analysis(
     analysis_dispatch_inputs: AnalysisDispatchModel,
     analysis_parameters: AnalysisInputModel
 ) -> dict | None:
-
+ 
     # parse parameters and validate them
     channel_dict = analysis_parameters.channels
     # require keys of the form G|R|Iso followed by _ and a digit 0-4 (e.g. "G_0", "R_3", "Iso_2")
@@ -66,9 +68,9 @@ def run_analysis(
     invalid = [k for k in channel_dict.keys() if not pattern.match(str(k))]
     if invalid:
         raise ValueError(f"Invalid channel keys (must match G/R/Iso_0-4): {invalid}")
-    # logger.info(f"Validated channel keys: {list(channel_dict.keys())}")
-
-
+    logger.info(f"Validated channel keys: {list(channel_dict.keys())}")
+ 
+ 
     # Execute analysis and write to results folder
     # using the passed parameters
     # Example of fetching metadata record from the dispatcher model:
@@ -79,8 +81,11 @@ def run_analysis(
     nwb_paths = analysis_dispatch_inputs.file_location
     fiber_path = next((p for p in nwb_paths if p.endswith("fib.nwb.zarr")), None)
     behavior_path = next((p for p in nwb_paths if p.endswith("behavior.nwb.zarr")), None)
-
+ 
     if fiber_path and behavior_path:
+        logger.info("Pavlovian file loading")
+        logger.info(f"loading {fiber_path}")
+        logger.info(f"loading {behavior_path}")
         with NWBCombineIO(behavior_path, [fiber_path]) as (nwbfile, main_io):
             nwbfile = main_io.read()
         df_events, df_fip, meta = pa.load_pavlovian_dfs(
@@ -92,55 +97,57 @@ def run_analysis(
         nwb.meta = meta
         pav_flag = True
     else:
+        logger.info("Dynamic foraging loading")
         for location in nwb_paths:
+            logger.info(f"loading {location}")
             with NWBZarrIO(location, 'r') as io:
                 nwbfile = io.read()
         # nwb processing code
         nwb = nwb_utils_rachel.attach_dfs(nwbfile)
         pav_flag = False
-
-    print(f"loading NWB : {nwb.session_id}")
+ 
+    logger.info(f"loaded NWB : {nwb.session_id}")
     # plot locations
     plot_loc = '/results/individual_plots/'
     aggregate_loc = '/results/aggregate_results/'
-
-    for path in [plot_loc, aggregate_loc]: 
+ 
+    for path in [plot_loc, aggregate_loc]:
         if not os.path.exists(path):
             os.makedirs(path)
-
+ 
     if analysis_parameters.preprocessing == "raw":
             channel_dict_pp = channel_dict
     else:
         channel_dict_pp = {f"{k}_{analysis_parameters.preprocessing}": v for k, v in channel_dict.items()}
-
+ 
     # simple analyses. anything more complicated, we should refactor
-    
+ 
     df_data_curation_vals = data_curation_summary_plots.get_df_data_curation(nwb, channel_dict_pp)
-    
-    data_curation_summary_plots.plot_data_curation_plotly(nwb, channel_dict_pp, df_data_curation_vals, analysis_parameters.preprocessing, 
+ 
+    data_curation_summary_plots.plot_data_curation_plotly(nwb, channel_dict_pp, df_data_curation_vals, analysis_parameters.preprocessing,
          pav_flag, loc = plot_loc)
-    data_curation_summary_plots.plot_data_curation(nwb, channel_dict_pp, df_data_curation_vals, analysis_parameters.preprocessing, 
+    data_curation_summary_plots.plot_data_curation(nwb, channel_dict_pp, df_data_curation_vals, analysis_parameters.preprocessing,
          pav_flag, loc = plot_loc)
-
+ 
     session_id = nwb.session_id.replace("behavior_","")
     df_data_curation_vals.to_csv(f'{aggregate_loc}{session_id}.csv', index=False)
     # save nwb so i can make lifetime plots later. a bit of a hack to get the ses_idx
-    print(f"now saving {nwb.session_id}")
+    logger.info(f"now saving {nwb.session_id}")
     nwb.df_fip = nwb.df_fip[::50]
     dummy_nwb = nwb_utils_rachel.dummy_nwb(nwb.df_trials, nwb.df_events, nwb.df_fip)
     dummy_nwb.session_id = session_id
     dummy_nwb.save(f'{aggregate_loc}')
-
-
+ 
+ 
     return {}
-
-
-
-
+ 
+ 
+ 
+ 
 if __name__ == "__main__":
     run_analysis_jobs(
         analysis_input_model=AnalysisInputModel,
         analysis_output_model=AnalysisOutputModel,
         run_function=run_analysis
     )
-
+ 
