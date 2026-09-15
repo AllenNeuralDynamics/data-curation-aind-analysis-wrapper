@@ -151,10 +151,7 @@ def run_analysis(
     # save nwb so i can make lifetime plots later. a bit of a hack to get the ses_idx
     logger.info(f"now saving {nwb.session_id}")
     nwb.df_fip = nwb.df_fip[::50]
-    dummy_nwb = nwb_utils_rachel.dummy_nwb(nwb.df_trials, nwb.df_events, nwb.df_fip)
-    dummy_nwb.session_id = session_id
-    dummy_nwb.save(f'{aggregate_loc}')
- 
+    nwb.df_fip.to_parquet(f'{aggregate_loc}{session_id}_df_fip.parquet')
  
     return {}
  
