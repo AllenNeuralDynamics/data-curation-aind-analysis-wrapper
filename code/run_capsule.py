@@ -149,9 +149,11 @@ def run_analysis(
     session_id = nwb.session_id.replace("behavior_","")
     df_data_curation_vals.to_csv(f'{aggregate_loc}{session_id}.csv', index=False)
     # save nwb so i can make lifetime plots later. a bit of a hack to get the ses_idx
-    logger.info(f"now saving {nwb.session_id}")
+    print(f"now saving {nwb.session_id}")
     nwb.df_fip = nwb.df_fip[::50]
     nwb.df_fip.to_parquet(f'{aggregate_loc}{session_id}_df_fip.parquet')
+
+    print(f"save_complete")
  
     return {}
  
