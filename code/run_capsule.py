@@ -48,7 +48,7 @@ load_dotenv("settings.env")
 # ======================================================================
  
  
- def _load_dynamic_foraging_nwb(nwb_paths):
+def _load_dynamic_foraging_nwb(nwb_paths):
     """Try each path in nwb_paths (in order) until one loads and attaches
     successfully. Returns the attached nwb, or raises RuntimeError with all
     collected errors if every path fails."""
