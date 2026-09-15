@@ -48,6 +48,28 @@ load_dotenv("settings.env")
 # ======================================================================
  
  
+ def _load_dynamic_foraging_nwb(nwb_paths):
+    """Try each path in nwb_paths (in order) until one loads and attaches
+    successfully. Returns the attached nwb, or raises RuntimeError with all
+    collected errors if every path fails."""
+    errors = {}
+    for location in nwb_paths:
+        logger.info(f"loading {location}")
+        try:
+            with NWBZarrIO(location, 'r') as io:
+                nwbfile = io.read()
+            nwb = nwb_utils_rachel.attach_dfs(nwbfile)
+        except Exception as e:
+            logger.warning(f"failed to load/attach {location}: {e}")
+            errors[location] = e
+            continue
+        else:
+            logger.info(f"successfully loaded {location}")
+            return nwb
+ 
+    raise RuntimeError(
+        f"Failed to load a usable NWB from any of {nwb_paths}. Errors: {errors}"
+    )
  
  
  
@@ -98,12 +120,7 @@ def run_analysis(
         pav_flag = True
     else:
         logger.info("Dynamic foraging loading")
-        for location in nwb_paths:
-            logger.info(f"loading {location}")
-            with NWBZarrIO(location, 'r') as io:
-                nwbfile = io.read()
-        # nwb processing code
-        nwb = nwb_utils_rachel.attach_dfs(nwbfile)
+        nwb = _load_dynamic_foraging_nwb(nwb_paths)
         pav_flag = False
  
     logger.info(f"loaded NWB : {nwb.session_id}")
