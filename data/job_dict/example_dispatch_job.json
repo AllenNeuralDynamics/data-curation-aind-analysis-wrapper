@@ -9,8 +9,7 @@
         "2b600188-5782-47d6-9d48-e42abb9cfe07"
     ],
     "file_location": [
-                    "s3://codeocean-s3datasetsbucket-1u41qdg42ur9/9a6857c0-e1e6-4968-a7ce-16485c47cf9d/behavior.nwb.zarr",
-        "s3://codeocean-s3datasetsbucket-1u41qdg42ur9/5cd67c7d-929e-4e40-ac48-97c06695b0b7/fib.nwb.zarr"
+                    "s3://codeocean-s3datasetsbucket-1u41qdg42ur9/65cb16eb-ef36-4ae6-b057-503521bcf48a/nwb/behavior_809487_2025-09-16_14-26-15.nwb"
 
 
    ],

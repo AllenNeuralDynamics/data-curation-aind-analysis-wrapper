@@ -71,6 +71,37 @@ def _load_dynamic_foraging_nwb(nwb_paths):
         f"Failed to load a usable NWB from any of {nwb_paths}. Errors: {errors}"
     )
  
+def format_channel_dict_pp(channel_dict, preprocessing, df_fip, logger):
+    """
+    Build the preprocessing-suffixed channel dict, then filter out any keys
+    that don't exist in df_fip['event'], logging a warning for each one dropped.
+
+    Parameters
+    ----------
+    channel_dict : dict
+        Original channel name -> value mapping.
+    preprocessing : str
+        analysis_parameters.preprocessing value (e.g. "raw", "poly", etc.)
+    df_fip : pd.DataFrame
+        nwb.df_fip, must have an 'event' column.
+    logger : logging.Logger
+
+    Returns
+    -------
+    dict
+        Filtered channel_dict_pp containing only keys present in df_fip['event'].
+    """
+    if preprocessing == "raw":
+        channel_dict_pp = dict(channel_dict)
+    else:
+        channel_dict_pp = {f"{k}_{preprocessing}": v for k, v in channel_dict.items()}
+
+    valid_events = set(df_fip['event'].unique())
+    missing_keys = [k for k in channel_dict_pp if k not in valid_events]
+    for k in missing_keys:
+        logger.warning(f"'{k}' not found in nwb.df_fip['event']; skipping from channel_dict_pp")
+
+    return {k: v for k, v in channel_dict_pp.items() if k in valid_events}
  
  
 AnalysisInputModel = DataCurationAnalysisSpecification
@@ -132,11 +163,10 @@ def run_analysis(
         if not os.path.exists(path):
             os.makedirs(path)
  
-    if analysis_parameters.preprocessing == "raw":
-            channel_dict_pp = channel_dict
-    else:
-        channel_dict_pp = {f"{k}_{analysis_parameters.preprocessing}": v for k, v in channel_dict.items()}
- 
+    channel_dict_pp = format_channel_dict_pp(
+            channel_dict, analysis_parameters.preprocessing, nwb.df_fip, logger
+        )
+
     # simple analyses. anything more complicated, we should refactor
  
     df_data_curation_vals = data_curation_summary_plots.get_df_data_curation(nwb, channel_dict_pp)
