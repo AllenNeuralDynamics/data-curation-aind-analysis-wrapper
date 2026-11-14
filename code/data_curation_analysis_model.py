@@ -19,6 +19,7 @@ class DataCurationAnalysisSpecification(GenericModel):
                     Keys = channel name, Value = intended location and measurement. \
                     NO preprocessing method included in suffix.")
     preprocessing: str=Field(description="preprocessing_method", default = "dff-bright_mc-iso-IRLS")
+    use_attached_nwb: bool=Field(description="use attached nwb instead of from analysis dispatch", default = False)
     # fitted_model: str=Field(default = "QLearning_L2F1_CKfull_softmax", description="Qlearning model fitted to get RPE")
     # pipeline_v14: bool=Field(default=False, description="Is the data coming from pipeline v14 and need timestamps/raw_timestamps swapped")
 

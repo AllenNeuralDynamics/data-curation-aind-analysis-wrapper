@@ -1,5 +1,7 @@
 import os
 import logging
+import glob
+from pathlib import Path
  
 from aind_data_schema.base import GenericModel
  
@@ -132,6 +134,14 @@ def run_analysis(
     #     first_record = metadata_records[0]
     #     data_description = first_record["data_description"]
     nwb_paths = analysis_dispatch_inputs.file_location
+    if analysis_parameters.use_attached_nwb:
+        logger.info("Skipping dispatch job file, using attached NWBs")
+        data_dir = Path("/data")  # Code Ocean data root; adjust if different
+        nwb_paths = sorted(
+                set(data_dir.glob("behavior*/nwb/*.nwb"))
+                | set(data_dir.glob("behavior*/*.nwb.zarr"))
+            )
+
     fiber_path = next((p for p in nwb_paths if p.endswith("fib.nwb.zarr")), None)
     behavior_path = next((p for p in nwb_paths if p.endswith("behavior.nwb.zarr")), None)
  
