@@ -34,17 +34,18 @@
         ],
         "parameters": {
             "dry run": "1",
-            "name": "NAc/VTA cohort 3",
-            "channels": {
-                "G_0": "NAcc: Calcium",
-                "R_0": "NAcc: DA",
-                "G_1": "VTA: Calcium"
-            },
+            "name": "One odd session out for 816883",
+            "channels":{
+                "G_0":"PL-LCAxonCa(L)",
+                "G_1":"NAc-DA(L)",
+                "G_2":"NAc-DA(R)",
+                "G_3":"no fiber"},
             "fitted_model": "QLearning_L1F1_CK1_softmax",
             "preprocessing": "dff-bright_mc-iso-IRLS",
             "file_location": [
                 "s3://codeocean-s3datasetsbucket-1u41qdg42ur9/4c2d2a94-59f0-4331-a32c-2440a95e6925/fib.nwb.zarr"
-            ]
+            ], 
+            "use_attached_nwb":1
         },
         "core_dependency": null
     }
