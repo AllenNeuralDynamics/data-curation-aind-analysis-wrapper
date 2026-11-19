@@ -1,18 +1,17 @@
 {
     "s3_location": [
-        "s3://codeocean-s3datasetsbucket-1u41qdg42ur9/4c2d2a94-59f0-4331-a32c-2440a95e6925"
+        "s3://aind-open-data/808054_2026-04-16_19-38-24_processed_2026-04-17_15-47-55"
     ],
     "asset_name": [
-        "behavior_788175_2025-07-14_14-14-15_processed_2026-04-05_23-35-31"
+        "808054_2026-04-16_19-38-24_processed_2026-04-17_15-47-55"
     ],
     "docdb_record_id": [
-        "2b600188-5782-47d6-9d48-e42abb9cfe07"
+        "1750a84b-f873-4845-bd21-13b6520235fb"
     ],
     "file_location": [
-                    "s3://codeocean-s3datasetsbucket-1u41qdg42ur9/65cb16eb-ef36-4ae6-b057-503521bcf48a/nwb/behavior_809487_2025-09-16_14-26-15.nwb"
+        "s3://aind-open-data/808054_2026-04-16_19-38-24_processed_2026-04-17_15-47-55/nwb/808054_2026-04-16_19-38-24.nwb"
+    ],
 
-
-   ],
 
     "distributed_parameters": null,
     "group_metadata": null,
@@ -45,7 +44,7 @@
             "file_location": [
                 "s3://codeocean-s3datasetsbucket-1u41qdg42ur9/4c2d2a94-59f0-4331-a32c-2440a95e6925/fib.nwb.zarr"
             ], 
-            "use_attached_nwb":1
+            "use_attached_nwb":0
         },
         "core_dependency": null
     }
